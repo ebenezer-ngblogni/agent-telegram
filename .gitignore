@@ -1,0 +1,18 @@
+.env
+*.log
+
+# Sorties LaTeX
+*.aux
+*.out
+*.pdf
+*.synctex.gz
+
+# CV réels et photo (données personnelles, hors dépôt)
+cvs/photo.png
+cvs/*.real.tex
+
+# Données du scraper
+scraper/data/
+__pycache__/
+*.pyc
+.venv/

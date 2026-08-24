@@ -1,0 +1,251 @@
+%!TEX program = xelatex
+\documentclass[a4paper,10pt]{article}
+
+% ============================================================
+% PACKAGES
+% ============================================================
+\usepackage[left=0.9cm, right=0.7cm, top=0.7cm, bottom=0.3cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{fontawesome5}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{paracol}
+\usepackage[defaultfam,tabular,lining]{montserrat}
+\usepackage[T1]{fontenc}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5pt}
+\setlength{\emergencystretch}{3em}
+
+% ============================================================
+% COULEURS
+% ============================================================
+\definecolor{sectioncolor}{RGB}{60, 70, 55}
+\definecolor{accentcolor}{RGB}{70, 80, 60}
+\definecolor{darktext}{RGB}{30, 30, 30}
+\definecolor{graytext}{RGB}{80, 80, 80}
+\definecolor{rulecolor}{RGB}{160, 160, 160}
+\definecolor{colsepcolor}{RGB}{180, 180, 180}
+\definecolor{linkcolor}{RGB}{30, 30, 30}
+
+% ============================================================
+% CONFIG HYPERREF (ATS friendly)
+% ============================================================
+\hypersetup{
+	colorlinks=true,
+	urlcolor=linkcolor,
+	linkcolor=linkcolor,
+	pdftitle={CV - Eben Ezer J.N. N'GBLOGNI - Développeur DevOps},
+	pdfauthor={Eben Ezer J.N. N'GBLOGNI},
+	pdfsubject={CV - Alternance Développeur DevOps - Sogeti},
+	pdfkeywords={DevOps, CI/CD, Jenkins, Gradle, Maven, Docker, Linux, Bash, Git, automatisation, pipelines, déploiement, API REST, Python, Java, alternance, ingénieur informatique}
+}
+
+% ============================================================
+% COMMANDES PERSONNALISEES
+% ============================================================
+
+\newcommand{\sectiontitle}[1]{%
+	\vspace{5pt}
+	{\Large\bfseries\color{sectioncolor} #1}\\[-2pt]
+	{\color{rulecolor}\rule{\linewidth}{1.2pt}}
+	\vspace{2pt}\par
+}
+\newcommand{\sectionright}[1]{%
+	\vspace{6pt}
+	{\Large\bfseries\color{sectioncolor} #1}\\[-2pt]
+	{\color{rulecolor}\rule{\linewidth}{1.2pt}}
+	\vspace{2pt}\par
+}
+
+\newcounter{tlbullet}
+\newcommand{\olivebullet}{%
+	\stepcounter{tlbullet}%
+	\tikz[remember picture, baseline=-0.6ex]{%
+		\node[circle, fill=accentcolor, inner sep=0pt, minimum size=6pt] (tl\the\value{tlbullet}) {};%
+	}%
+}
+\newcommand{\smallbullet}{\tikz[baseline=-0.6ex]\fill[accentcolor] (0,0) circle (2pt);}
+\newcommand{\tlmark}[1]{\tikz[remember picture, overlay]{\coordinate (#1) at (0,0);}}
+
+\newcommand{\contactitem}[2]{%
+	\vspace{2pt}
+	{\color{accentcolor}#1}\hspace{6pt}{\small\color{darktext}#2}\par
+}
+
+\newcommand{\experience}[4]{%
+	\vspace{1pt}
+	\noindent\olivebullet\hspace{6pt}\parbox[t]{0.4\linewidth}{\textbf{#1}}\hfill{\small #2}\par
+	\begingroup\leftskip=14pt
+	{\itshape\color{graytext} #3}\par
+	{\small\color{darktext} #4}\par
+	\endgroup
+	\vspace{2pt}
+}
+
+\newcommand{\education}[5]{%
+	\vspace{2pt}
+	\noindent\olivebullet\hspace{6pt}\parbox[t]{0.55\linewidth}{\textbf{#1}}\hfill{\small #2}\par
+	\begingroup\leftskip=14pt
+	{\itshape\color{graytext} #3}\par
+	\ifx&#4&\else{\small\color{darktext} #4}\par\fi
+	\ifx&#5&\else{\small\color{darktext} #5}\par\fi
+	\endgroup
+	\vspace{3pt}
+}
+
+\newcommand{\projet}[5]{%
+	\vspace{2pt}
+	\noindent\olivebullet\hspace{6pt}\textbf{#1}\hfill{\small\href{#2}{\color{accentcolor}\faGlobeAmericas}~{\small\href{#2}{#3}}}\par
+	\begingroup\leftskip=14pt
+	{\small\color{darktext} #4}\par\vspace{1pt}
+	{\small\textbf{Stack} : #5}\par
+	\endgroup
+	\vspace{3pt}
+}
+
+% ============================================================
+% DOCUMENT
+% ============================================================
+\begin{document}
+	\pagestyle{empty}
+	\color{darktext}
+
+	\columnratio{0.35}
+	\setlength{\columnsep}{1.2cm}
+	\begin{paracol}{2}
+
+		% ============================================================
+		% COLONNE GAUCHE
+		% ============================================================
+		\begin{center}
+			\vspace{4pt}
+			{\fontsize{24}{28}\selectfont\bfseries\color{sectioncolor} N'GBLOGNI}\\[2pt]
+			{\fontsize{24}{28}\selectfont\bfseries\color{sectioncolor} Eben Ezer J.N.}\\[6pt]
+			{\large\color{graytext} Développeur DevOps}
+
+			\vspace{6pt}
+
+			\includegraphics[width=4.8cm]{photo.png}
+		\end{center}
+
+		\vspace{2pt}
+
+		% Contacts
+		\sectiontitle{Contacts}
+
+		\contactitem{\faGlobeAmericas}{Portfolio : \href{https://eben-ezer.site}{eben-ezer.site}}
+		\contactitem{\faPhone*}{+33 0 00 00 00 00}
+		\contactitem{\faEnvelope}{\href{mailto:prenom.nom@example.com}{prenom.nom@example.com}}
+		\contactitem{\faMapMarker*}{62100 Calais | Mobilité :\newline France entière}
+		\contactitem{\faGithub}{\href{https://github.com/ebenezer-ngblogni}{github.com/ebenezer-ngblogni}}
+		\contactitem{\faLinkedin}{\href{https://linkedin.com/in/eben-ngb}{linkedin.com/in/eben-ngb}}
+
+		% Compétences
+		\sectiontitle{Compétences}
+
+		{\small
+			\textbf{DevOps \& CI/CD} : Docker, Git, GitHub,\newline Linux, Bash, déploiement continu\par\vspace{1pt}
+			\textbf{Langages} : Java, Python, JavaScript,\newline PHP, Bash, SQL, C\par\vspace{1pt}
+			\textbf{Systèmes} : Linux (Debian, Ubuntu),\newline administration serveur\par\vspace{1pt}
+			\textbf{Back-end} : API REST, Laravel, Node.js\par\vspace{1pt}
+			\textbf{Bases de données} : MySQL, PostgreSQL,\newline SQL avancé (optimisation)\par\vspace{1pt}
+			\textbf{Architecture} : API REST, WebSockets,\newline conteneurisation
+		}
+
+		% Langues
+		\sectiontitle{Langues}
+
+		\vspace{2pt}
+		\smallbullet\hspace{6pt}{\small Français (Langue maternelle)}\par\vspace{3pt}
+		\smallbullet\hspace{6pt}{\small Anglais (B2 855/990 au TOEIC)}
+
+		% Soft Skills
+		\sectiontitle{Soft Skills}
+
+		\vspace{1pt}
+		\begin{itemize}[leftmargin=14pt, itemsep=2pt, parsep=0pt, topsep=0pt, label={\smallbullet}]
+			\item {\small Curiosité technique}
+			\item {\small Travail en équipe}
+			\item {\small Rigueur et documentation}
+			\item {\small Autonomie}
+			\item {\small Adaptabilité}
+		\end{itemize}
+
+		% ============================================================
+		% COLONNE DROITE
+		% ============================================================
+		\switchcolumn
+
+		\vspace{4pt}
+
+		% Profil
+		\sectiontitle{Profil}
+
+		{\small
+			Élève ingénieur en informatique à l'EILCO, major de promotion (17,17/20). Développeur full stack avec une pratique quotidienne de Docker, Linux et Git. Expérience concrète en déploiement, conteneurisation et maintenance d'applications en production. Je recherche une alternance de 2~ans dès septembre~2026.
+		}
+
+		% Expériences Professionnelles
+		\sectionright{Expériences Professionnelles}
+
+		\experience{Développeur full stack \&\newline responsable production}{Août 2025 - Février 2026}{Ok2gether, Temps partiel}{Conteneurisation Docker, déploiements sur serveur Linux. API REST (Laravel), paiement Stripe. Supervision et maintenance applicative en production.}
+
+		\experience{Développeur web}{Octobre 2023 - Janvier 2025}{Manobi Africa, Cotonou}{Développement de 3~applications web en équipe (5~personnes). Optimisation des requêtes SQL (-30\% de temps de chargement). Versioning Git et revues de code.}
+
+		\experience{Enseignant stagiaire}{Janvier 2021 - Décembre 2021}{Collège d'Enseignement Général 1, Bembèrèkè}{Enseignement à 2~classes (40+ élèves). Taux de réussite de 80\%.\tlmark{expend}}
+
+		% Formation
+		\sectionright{Formation}
+
+		\education{Ingénieur en Informatique}{Septembre 2025 - En cours}{École d'Ingénieurs du Littoral Côte d'Opale (EILCO)}{Major de promotion, 1er semestre : 17,17/20}{}
+
+		\education{Master 1 en IA et Big Data}{Octobre 2024 - Août 2025}{Pigier Bénin (Formation continue)}{Mention : Très Bien}{}
+
+		\education{Licence en Informatique}{Octobre 2022 - Juin 2023}{Institut de Mathématiques et de Sciences Physiques / Université d'Abomey-Calavi}{Mention : Bien}{}
+
+		\education{Licence professionnelle en Mathématiques-Informatique}{Octobre 2018 - Juin 2022}{ENS / UNSTIM}{Mention : Bien\tlmark{eduend}}{}
+
+		% Projets
+		\sectionright{Projets}
+
+		\projet{Ok2gether}{https://ok2gether.fr}{ok2gether.fr}{Application de coparentalité en bêta-test (50+ familles). Déploiement conteneurisé Docker, supervision serveur Linux, API REST.}{Laravel, React, MySQL, Docker, WebSockets}
+
+		\projet{Electrotché}{https://electrotche.com}{electrotche.com}{E-commerce (100+ produits), authentification sécurisée, paiement intégré, panel admin.}{Next.js, TypeScript, PostgreSQL, NextAuth\tlmark{projend}}
+
+		% Références
+		\sectionright{Références}
+
+		\vspace{2pt}
+		\noindent
+		\begin{minipage}[t]{0.48\linewidth}
+			{\small\textbf{Prénom NOM}}\par\vspace{1pt}
+			{\footnotesize\color{graytext} Manager adjoint, Manobi}\par\vspace{1pt}
+			{\footnotesize \faPhone*~+00 0 00 00 00 00}\par\vspace{1pt}
+			{\footnotesize \faEnvelope~\href{mailto:referent1@example.com}{referent1@example.com}}
+		\end{minipage}%
+		\hfill
+		\begin{minipage}[t]{0.48\linewidth}
+			{\small\textbf{Prénom NOM}}\par\vspace{1pt}
+			{\footnotesize\color{graytext} Fondateur, ok2gether}\par\vspace{1pt}
+			{\footnotesize \faPhone*~+33 0 00 00 00 00}\par\vspace{1pt}
+			{\footnotesize \faEnvelope~\href{mailto:referent2@example.com}{referent2@example.com}}
+		\end{minipage}
+
+		% Timeline (nécessite 2 compilations)
+		\begin{tikzpicture}[remember picture, overlay]
+			\draw[colsepcolor, line width=0.8pt] (tl1) -- (tl1 |- expend);
+			\draw[colsepcolor, line width=0.8pt] (tl4) -- (tl4 |- eduend);
+			\draw[colsepcolor, line width=0.8pt] (tl8) -- (tl8 |- projend);
+			\foreach \i in {1,...,9} {
+				\fill[accentcolor] (tl\i) circle (3pt);
+			}
+		\end{tikzpicture}
+
+	\end{paracol}
+\end{document}

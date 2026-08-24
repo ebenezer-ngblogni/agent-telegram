@@ -1,0 +1,15 @@
+[Unit]
+Description=Agent CV Alternance (bot Telegram)
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/alternance-agent/agent
+EnvironmentFile=/opt/alternance-agent/.env
+ExecStart=/usr/bin/python3 /opt/alternance-agent/agent/agent.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

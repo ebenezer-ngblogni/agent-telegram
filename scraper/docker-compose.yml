@@ -1,0 +1,15 @@
+services:
+  scraper:
+    build: .
+    container_name: cv_scraper
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.5-flash}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - FRANCE_TRAVAIL_CLIENT_ID=${FRANCE_TRAVAIL_CLIENT_ID}
+      - FRANCE_TRAVAIL_CLIENT_SECRET=${FRANCE_TRAVAIL_CLIENT_SECRET}
+    volumes:
+      # Les JSON sont écrits ici → lisibles depuis Claude Code sur ta machine
+      - /home/eben/Bureau/CV:/data
+    restart: "no"
