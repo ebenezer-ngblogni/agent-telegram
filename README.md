@@ -84,3 +84,9 @@ coordonnées et des référents). Les vrais CV restent hors dépôt.
 
 Python 3 · python-telegram-bot 22.7 · google-genai (Gemini 2.5 Flash) ·
 Playwright · LaTeX/XeLaTeX · Docker · systemd
+
+## Captures
+
+![Architecture](docs/img/01-architecture.png)
+![Service systemd](docs/img/02-service.png)
+![Contrainte LaTeX](docs/img/03-code.png)
