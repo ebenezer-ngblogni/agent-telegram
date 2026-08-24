@@ -1,4 +1,4 @@
-# Agent Telegram — candidatures d'alternance
+# Agent Telegram de candidature d'alternance
 
 Deux briques autonomes qui tournent sur un VPS et se rejoignent sur Telegram :
 un **bot** qui transforme une offre d'emploi en CV et lettre de motivation compilés
@@ -10,7 +10,7 @@ On lui colle le texte d'une offre dans Telegram. Il répond avec deux PDF.
 
 ```
 Offre collée dans Telegram
-  └─ Gemini 2.5 Flash — pertinence + extraction (entreprise, poste, lieu, stack)
+  └─ Gemini 2.5 Flash : pertinence et extraction (entreprise, poste, lieu, stack)
        ├─ hors sujet ──────────────────────────► rejet motivé
        └─ pertinente
             ├─ choix du template LaTeX selon le job_type détecté
@@ -41,8 +41,9 @@ cron 2×/jour
 
 Le rejet rapide passe avant le LLM : filtrer sur le type de contrat et la durée
 coûte zéro token et élimine la majeure partie du bruit. Un piège rencontré en
-route : France Travail encode les alternances en `"CDD - 24 Mois"`, donc exclure
-« CDD » supprimait aussi les bonnes offres — le tri se fait sur la présence
+route : France Travail encode les alternances sous une durée « 24 Mois » sur
+un type CDD, donc exclure « CDD » supprimait aussi les bonnes offres. Le tri se
+fait sur la présence
 d'« alternance » ou « apprentissage » dans le texte, pas sur le type de contrat.
 
 `scrapers/indeed.py` et `scrapers/apec.py` sont présents mais pas enregistrés
@@ -72,7 +73,7 @@ cd scraper && docker compose run --rm scraper python main.py --dry-run
 
 ## Configuration
 
-Tout passe par l'environnement, rien n'est en dur dans le code — voir
+Tout passe par l'environnement, rien n'est en dur dans le code. Voir
 `.env.example`. `CANDIDATE_NAME`, `CANDIDATE_PROFILE`, `CANDIDATE_STACK` et
 `CANDIDATE_PITCH` sont injectés dans les prompts : le dépôt est réutilisable en
 changeant ces quatre variables et les templates.
@@ -84,6 +85,27 @@ coordonnées et des référents). Les vrais CV restent hors dépôt.
 
 Python 3 · python-telegram-bot 22.7 · google-genai (Gemini 2.5 Flash) ·
 Playwright · LaTeX/XeLaTeX · Docker · systemd
+
+## Version n8n
+
+Le même flux existe aussi en workflow n8n importable (`deploy/n8n-workflow.json`,
+n8n 2.18). Le Telegram Trigger reçoit l'offre, deux nœuds IF filtrent le chat
+autorisé puis la longueur du texte, un Information Extractor branché sur Gemini
+2.5 Flash produit le verdict de pertinence, un IF route vers accusé de réception
+ou rejet, un nœud Code choisit le template, deux Chain LLM (Gemini) rédigent le
+CV et la lettre, un Execute Command lance la compilation xelatex, et deux nœuds
+Telegram renvoient les PDF.
+
+![Workflow n8n](docs/img/04-n8n-canvas.png)
+
+Import :
+
+```bash
+docker exec -i n8n n8n import:workflow --input=/chemin/n8n-workflow.json
+```
+
+Les credentials Telegram et Google Gemini se renseignent ensuite dans l'UI, et le
+nœud Execute Command appelle un script `compile.sh` côté hôte pour xelatex.
 
 ## Captures
 

@@ -29,7 +29,7 @@ crontab -e
 Cron (2x/jour)
   → Scraper (HelloWork + APEC + Indeed)
   → Filtre rapide (rejet bac+2, CDI, rythme incompatible...)
-  → Score Claude API (Haiku — peu coûteux)
+  → Score Gemini (2.5 Flash, peu coûteux)
   → Sauvegarde dans /home/eben/Bureau/CV/offres_nouvelles.json
   → Notification Telegram
 ```

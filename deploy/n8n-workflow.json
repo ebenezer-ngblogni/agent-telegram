@@ -1,0 +1,465 @@
+{
+  "name": "Agent CV Alternance",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "telegram-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -220,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.message.chat.id }}",
+              "rightValue": "={{ $env.TELEGRAM_CHAT_ID }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "chat-autorise-",
+      "name": "Chat autorise ?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c2",
+              "leftValue": "={{ $json.message.text.length }}",
+              "rightValue": 80,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "texte-assez-long-",
+      "name": "Texte assez long ?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        220,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.message.text }}",
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"is_relevant\": {\n      \"type\": \"boolean\",\n      \"description\": \"L'offre correspond au profil du candidat\"\n    },\n    \"reason\": {\n      \"type\": \"string\",\n      \"description\": \"Explication courte du verdict\"\n    },\n    \"job_type\": {\n      \"type\": \"string\",\n      \"enum\": [\n        \"mobile\",\n        \"java\",\n        \"devops\",\n        \"web\",\n        \"backend\",\n        \"web_mobile\",\n        \"generic\"\n      ]\n    },\n    \"company\": {\n      \"type\": \"string\"\n    },\n    \"title\": {\n      \"type\": \"string\"\n    },\n    \"location\": {\n      \"type\": \"string\"\n    },\n    \"mobility\": {\n      \"type\": \"string\"\n    },\n    \"key_skills\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    }\n  },\n  \"required\": [\n    \"is_relevant\",\n    \"reason\",\n    \"job_type\",\n    \"company\",\n    \"title\"\n  ]\n}",
+        "options": {
+          "systemPromptTemplate": "Tu filtres des offres d'alternance pour un eleve ingenieur informatique (Java, JavaScript, PHP, Python, Flutter, React, Spring Boot, Laravel, Docker, Git, Linux). Mobilite France entiere.\n\nEXCLUS : les organismes de formation qui recrutent pour leur propre diplome, les offres hors informatique, les arnaques.\n\nExtrais les champs demandes a partir de l'offre."
+        }
+      },
+      "id": "analyse-de-pertinence",
+      "name": "Analyse de pertinence",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        440,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "id": "gemini-(tri)",
+      "name": "Gemini (tri)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        440,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c3",
+              "leftValue": "={{ $json.output.is_relevant }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "offre-pertinente-",
+      "name": "Offre pertinente ?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        700,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=Offre retenue.\n\nEntreprise : {{ $json.output.company }}\nPoste : {{ $json.output.title }}\nLieu : {{ $json.output.location }}\nCompetences : {{ $json.output.key_skills.join(', ') }}\n\nGeneration du CV et de la lettre.",
+        "additionalFields": {}
+      },
+      "id": "accuse-de-reception",
+      "name": "Accuse de reception",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        940,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=Offre ecartee. Raison : {{ $json.output.reason }}",
+        "additionalFields": {}
+      },
+      "id": "rejet-motive",
+      "name": "Rejet motive",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        940,
+        540
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const TEMPLATES = {\n  mobile:     'cv_amiltone_mobile.tex',\n  java:       'cv_capgemini_java.tex',\n  devops:     'cv_enedis_devops.tex',\n  web:        'cv_hutchinson_web.tex',\n  web_mobile: 'cv_sg_web_mobile.tex',\n  backend:    'cv_credit_agricole_backend.tex',\n  generic:    'cv.tex',\n};\n\nconst a = $input.first().json.output;\nconst template = TEMPLATES[a.job_type] || TEMPLATES.generic;\nconst slug = (a.company || 'entreprise').replace(/[^a-zA-Z0-9]/g, '_').slice(0, 20);\n\nreturn [{ json: { ...a, template, slug } }];"
+      },
+      "id": "choix-du-template",
+      "name": "Choix du template",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Tu es expert LaTeX. Adapte ce CV pour l'offre ci-dessous.\n\nREGLES ABSOLUES :\n1. Modifie UNIQUEMENT : titre sous le nom, section Profil, ordre et contenu des Competences, mobilite dans Contacts\n2. Ne touche PAS aux sections Experiences, Formation, References, Timeline TikZ\n3. Le CV DOIT rester sur 1 page, ne rallonge pas les textes\n4. Conserve EXACTEMENT la syntaxe LaTeX sans rien casser\n5. Mets en avant les competences : {{ $json.key_skills.join(', ') }}\n6. Mobilite a mettre : {{ $json.mobility }}\n\nPOSTE : {{ $json.title }} chez {{ $json.company }}\n\nReponds UNIQUEMENT avec le LaTeX complet, sans balises markdown.",
+        "messages": {}
+      },
+      "id": "adaptation-du-cv",
+      "name": "Adaptation du CV",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1380,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "id": "gemini-(cv)",
+      "name": "Gemini (CV)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1380,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Genere une lettre de motivation LaTeX.\n\nREGLES :\n- Pas de tirets longs dans le texte\n- 4 paragraphes : accroche, competences, motivation entreprise, conclusion\n- documentclass article 11pt, marges 2.5cm, police Montserrat\n\nPoste : {{ $('Choix du template').item.json.title }}\nEntreprise : {{ $('Choix du template').item.json.company }}\nLieu : {{ $('Choix du template').item.json.location }}\n\nReponds UNIQUEMENT avec le LaTeX complet, sans balises markdown.",
+        "messages": {}
+      },
+      "id": "redaction-de-la-lettre",
+      "name": "Redaction de la lettre",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1620,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "id": "gemini-(lettre)",
+      "name": "Gemini (lettre)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1620,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=/opt/alternance-agent/bin/compile.sh {{ $('Choix du template').item.json.slug }}"
+      },
+      "id": "compilation-xelatex",
+      "name": "Compilation xelatex",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1860,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "sendDocument",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "id": "envoi-du-cv",
+      "name": "Envoi du CV",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2080,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "sendDocument",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "id": "envoi-de-la-lettre",
+      "name": "Envoi de la lettre",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2080,
+        240
+      ]
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Chat autorise ?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat autorise ?": {
+      "main": [
+        [
+          {
+            "node": "Texte assez long ?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Texte assez long ?": {
+      "main": [
+        [
+          {
+            "node": "Analyse de pertinence",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Analyse de pertinence": {
+      "main": [
+        [
+          {
+            "node": "Offre pertinente ?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini (tri)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyse de pertinence",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Offre pertinente ?": {
+      "main": [
+        [
+          {
+            "node": "Accuse de reception",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Rejet motive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Accuse de reception": {
+      "main": [
+        [
+          {
+            "node": "Choix du template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Choix du template": {
+      "main": [
+        [
+          {
+            "node": "Adaptation du CV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini (CV)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Adaptation du CV",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adaptation du CV": {
+      "main": [
+        [
+          {
+            "node": "Redaction de la lettre",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini (lettre)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Redaction de la lettre",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redaction de la lettre": {
+      "main": [
+        [
+          {
+            "node": "Compilation xelatex",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compilation xelatex": {
+      "main": [
+        [
+          {
+            "node": "Envoi du CV",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Envoi de la lettre",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "id": "AgentCVAlternance1",
+  "versionId": "00000000-0000-4000-8000-000000000001"
+}
