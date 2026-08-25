@@ -88,13 +88,12 @@ Playwright · LaTeX/XeLaTeX · Docker · systemd
 
 ## Version n8n
 
-Le même flux existe aussi en workflow n8n importable (`deploy/n8n-workflow.json`,
-n8n 2.18). Le Telegram Trigger reçoit l'offre, deux nœuds IF filtrent le chat
-autorisé puis la longueur du texte, un Information Extractor branché sur Gemini
-2.5 Flash produit le verdict de pertinence, un IF route vers accusé de réception
-ou rejet, un nœud Code choisit le template, deux Chain LLM (Gemini) rédigent le
-CV et la lettre, un Execute Command lance la compilation xelatex, et deux nœuds
-Telegram renvoient les PDF.
+Le tri des offres existe aussi en workflow n8n importable
+(`deploy/n8n-workflow.json`, n8n 2.18). Le Telegram Trigger reçoit l'offre, deux
+nœuds IF filtrent le chat autorisé puis la longueur du texte, un Information
+Extractor branché sur Gemini 2.5 Flash produit le verdict de pertinence, et un
+dernier IF route vers une alerte « offre retenue » ou un message « offre écartée »
+avec la raison.
 
 ![Workflow n8n](docs/img/04-n8n-canvas.png)
 
@@ -104,8 +103,7 @@ Import :
 docker exec -i n8n n8n import:workflow --input=/chemin/n8n-workflow.json
 ```
 
-Les credentials Telegram et Google Gemini se renseignent ensuite dans l'UI, et le
-nœud Execute Command appelle un script `compile.sh` côté hôte pour xelatex.
+Les credentials Telegram et Google Gemini se renseignent ensuite dans l'UI.
 
 ## Captures
 
